@@ -9,6 +9,7 @@ from matplotlib.widgets import Cursor
 from scipy.integrate import odeint
 
 
+
 class CircuitoRetificadorApp:
     def __init__(self, root):
         self.root = root
@@ -20,14 +21,7 @@ class CircuitoRetificadorApp:
         self.fonte = ('Arial', 10)
         self.fonte_titulo = ('Arial', 12, 'bold')
 
-        # Variáveis do circuito
-        self.Vrms = tk.DoubleVar(value=36)
-        self.freq = tk.DoubleVar(value=60)
-        self.R = tk.DoubleVar(value=10)
-        self.L = tk.DoubleVar(value=1)
-        self.C = tk.DoubleVar(value=1000e-6)  # 1000 μF
-        self.Vd_schottky = tk.DoubleVar(value=0.3)
-        self.Vd_common = tk.DoubleVar(value=0.7)
+
 
         # Dados atuais para interação
         self.current_t = None
