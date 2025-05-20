@@ -99,7 +99,7 @@ class CircuitoRetificadorApp:
             tk.Label(frame, text=nome, width=25, anchor="w", 
                    font=self.fonte, bg='#f0f0f0').pack(side=tk.LEFT)
             self.labels_resultados[nome] = tk.Label(frame, text="---", fg="blue", 
-                                                 font=self.fonte, bg='#f0f0f0', width=10)
+                                                 font=self.fonte, bg='#f0f0f0', width=15)  # Aumentado de 10 para 15
             self.labels_resultados[nome].pack(side=tk.LEFT)
             tk.Label(frame, text=unidade, font=self.fonte, 
                    bg='#f0f0f0').pack(side=tk.LEFT, padx=5)
@@ -167,25 +167,31 @@ class CircuitoRetificadorApp:
         
         # Diodo Schottky (1N5819)
         c.create_line(100, 125, 130, 125, width=2)
-        self.desenhar_diodo(130, 125, 'right', '1N5819', 'red')
+        self.desenhar_diodo(130, 125, 'right', '', 'red')
+        c.create_text(138, 105, text='1N5859', font=('Arial', 8), fill='black')
         
         # Nó de conexão
         c.create_oval(155, 122, 158, 128, fill='black')
         
         # Ramo 1: Indutor + Resistor
-        c.create_line(158, 125, 200, 125, width=2)
+        c.create_line(150, 125, 200, 125, width=2)
         self.desenhar_indutor(200, 125)
-        c.create_line(200, 125, 250, 125, width=2)
-        self.desenhar_resistor(250, 175, f"{self.R.get()}Ω")
-        c.create_line(250, 125, 250, 165, width=2)
+        c.create_line(180, 125, 250, 125, width=2)
+        self.desenhar_resistor(300, 175, f"{self.R.get()}Ω")
+        c.create_line(250, 125, 250, 160, width=2)
         
-        # Capacitor em Paralelo com Resistor - DESENHO CORRIGIDO
-        self.desenhar_capacitor(300, 125, f"{self.C.get() * 1e6:.0f}μF")
-        c.create_line(250, 185, 250, 210, width=2)
+        # Capacitor em Paralelo com Resistor
+        c.create_line(250, 125, 300, 125, width=2)
+        c.create_line(300, 125, 300, 175, width=2)
+        self.desenhar_capacitor(250, 175, f"{self.C.get() * 1e9:.0f}pF")
+        c.create_line(250, 210, 300, 210, width=2)
+        c.create_line(300, 175, 300, 210, width=2)
+        c.create_line(250, 190, 250, 210, width=2)
         
         # Ramo 2: Diodo de roda livre (1N4007)
         c.create_line(158, 125, 158, 175, width=2)
-        self.desenhar_diodo(158, 175, 'up', '1N4007', 'green')
+        self.desenhar_diodo(158, 175, 'up', '', 'green')
+        c.create_text(180, 150, text="1N4007", font=('Arial', 8), fill='black')
         c.create_line(158, 175, 158, 210, width=2)
         
         # Ramo 3: conexão do nó do resistor, diodo 1N4007 e fonte
@@ -193,7 +199,7 @@ class CircuitoRetificadorApp:
         c.create_line(70, 210, 70, 150, width=2)
         
         # Legenda
-        c.create_text(250, 50, text="Circuito Retificador com Filtro LC",
+        c.create_text(250, 50, text="Circuito Retificador",
                      font=('Arial', 12, 'bold'), fill='black')
         c.create_text(250, 80, text="Diodo Schottky (1N5819) e Diodo de Roda Livre (1N4007)",
                      font=('Arial', 10), fill='black')
@@ -215,27 +221,27 @@ class CircuitoRetificadorApp:
                 x - 20 + i * 8, y - 10, x - 12 + i * 8, y + 10,
                 start=0, extent=180, style='arc', width=2
             )
-        self.canvas_circuito.create_text(x, y - 15, text=f"{self.L.get()}H", font=('Arial', 8))
+        self.canvas_circuito.create_text(x, y - 20, text=f"{self.L.get()}H", font=('Arial', 8))
 
     def desenhar_resistor(self, x, y, valor):
         self.canvas_circuito.create_rectangle(
             x - 15, y - 10, x + 15, y + 10,
             fill='brown', outline='black', width=2
         )
-        self.canvas_circuito.create_text(x, y, text=valor, font=('Arial', 8))
+        self.canvas_circuito.create_text(x + 35, y, text=valor, font=('Arial', 8))
 
     def desenhar_capacitor(self, x, y, valor):
-        # Desenho do capacitor corrigido - posicionado corretamente em paralelo
-        # Linhas verticais (placas do capacitor)
-        self.canvas_circuito.create_line(x - 15, y - 15, x - 15, y + 15, width=2)
-        self.canvas_circuito.create_line(x + 15, y - 15, x + 15, y + 15, width=2)
+        # Desenho do capacitor na vertical
+        # Linhas horizontais (placas do capacitor)
+        self.canvas_circuito.create_line(x - 15, y - 15, x + 15, y - 15, width=2)  # Placa superior
+        self.canvas_circuito.create_line(x - 15, y + 15, x + 15, y + 15, width=2)  # Placa inferior
         
-        # Conexões horizontais
-        self.canvas_circuito.create_line(x - 25, y, x - 15, y, width=2)
-        self.canvas_circuito.create_line(x + 15, y, x + 25, y, width=2)
+        # Conexões verticais
+        self.canvas_circuito.create_line(x, y - 25, x, y - 15, width=2)  # Conexão superior
+        self.canvas_circuito.create_line(x, y + 15, x, y + 25, width=2)  # Conexão inferior
         
-        # Texto do valor
-        self.canvas_circuito.create_text(x, y + 25, text=valor, font=('Arial', 8))
+        # Texto do valor (posicionado ao lado)
+        self.canvas_circuito.create_text(x - 60, y, text=valor, font=('Arial', 8), anchor='w')
 
     def calcular_resposta_frequencia(self, R, L, C):
         # Criar função de transferência do filtro LC
@@ -277,8 +283,8 @@ class CircuitoRetificadorApp:
             # Frequência de corte do filtro LC
             self.f_cut = 1 / (2 * math.pi * math.sqrt(L * C))
 
-            # Simulação numérica
-            t = np.linspace(0, 4 * T, 4000)
+            # Simulação numérica - Aumentado de 4 para 10 ciclos e de 4000 para 10000 pontos
+            t = np.linspace(0, 10 * T, 10000)  # 10 ciclos com 10000 pontos
             y0 = [0, 0]  # [corrente no indutor, tensão no capacitor]
 
             def circuito_deriv(y, t):
@@ -374,7 +380,7 @@ class CircuitoRetificadorApp:
         mean_V_R = np.mean(V_R[len(V_R) // 2:])
         ax3.axhline(mean_V_R, color='k', linestyle='--', linewidth=1,
                    label=f'Média = {mean_V_R:.2f}V')
-        ax3.set_title('3. Tensão na Carga com Filtro LC', fontsize=10, pad=10)
+        ax3.set_title('3. Tensão na Carga', fontsize=10, pad=10)
         ax3.set_xlabel('Tempo (s)', fontsize=9)
         ax3.set_ylabel('Tensão (V)', fontsize=9)
         ax3.legend(fontsize=8, loc='upper right')
